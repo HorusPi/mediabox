@@ -239,29 +239,28 @@ services:
       - ${USENET_DOWNLOADS}/incomplete:/incomplete-downloads
     restart: unless-stopped
 
-  calibre:
-    image: linuxserver/calibre
-    container_name: calibre
+  lazylibrarian:
+    image: linuxserver/lazylibrarian
+    container_name: lazylibrarian
     networks:
       default:
         ipv4_address: 172.20.2.1
     ports:
-      - 9080:8080
-      - 9081:8081
+      - 5299:5299
     labels:
       - com.centurylinklabs.watchtower.enable=true
       - traefik.enable=true
-      - traefik.http.routers.calibre.rule=Host(`calibre.${DOMAIN}`)
-      - traefik.http.routers.calibre.entrypoints=web
-      - traefik.http.services.calibre.loadbalancer.server.port=8080
+      - traefik.http.routers.lazylibrarian.rule=Host(`books.${DOMAIN}`)
+      - traefik.http.routers.lazylibrarian.entrypoints=web
     environment:
       - PUID=${PUID}
       - PGID=${PGID}
       - TZ=${TIMEZONE}
-      - GUAC_USER=${CALIBRE_USERNAME}
-      - GUAC_PASS=${CALIBRE_PASSWORD}
+      - DOCKER_MODS=linuxserver/calibre-web:calibre|linuxserver/mods:lazylibrarian-ffmpeg
     volumes:
-      - ${CALIBRE}:/config
+      - ${LAZYLIBRARIAN}/config:/config
+      - ${LAZYLIBRARIAN}/books:/books
+      - ${TORRENT_DOWNLOADS}:/downloads
     restart: unless-stopped
 
   portainer:
